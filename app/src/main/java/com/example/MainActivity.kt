@@ -10,6 +10,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -73,48 +74,65 @@ fun MainAppWorkspace(
     val configuration = LocalConfiguration.current
     val isTablet = configuration.screenWidthDp >= 600
 
-    // Tab items list with their labels, icon assets, and identifiers
+    // Tab items list with their labels and identifiers.
+    // Shortened to "Novo" to ensure perfect symmetry and proportional sizes.
     val navItems = listOf(
-        Triple("dashboard", "Dashboard", Icons.Default.Dashboard),
-        Triple("clients", "Clientes", Icons.Default.Person),
-        Triple("services", "Serviços", Icons.Default.Build),
-        Triple("new_budget", "Novo Orçamento", Icons.Default.AddCircle),
-        Triple("history", "Histórico", Icons.Default.History)
+        "dashboard" to "Dashboard",
+        "clients" to "Clientes",
+        "services" to "Serviços",
+        "new_budget" to "Novo",
+        "history" to "Histórico"
     )
 
     Row(modifier = Modifier.fillMaxSize()) {
         // Navigation Rail on Tablets / Widescreens (Expanded Form Factor)
         if (isTablet) {
-            NavigationRail(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical)),
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                header = {
-                    Box(
-                        modifier = Modifier.padding(vertical = 24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "OF",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+            Row(modifier = Modifier.fillMaxHeight()) {
+                NavigationRail(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical)),
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    header = {
+                        Box(
+                            modifier = Modifier.padding(vertical = 24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "OF",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    navItems.forEach { (route, label) ->
+                        val isSelected = currentTab == route
+                        val icon = when (route) {
+                            "dashboard" -> if (isSelected) Icons.Filled.Dashboard else Icons.Outlined.Dashboard
+                            "clients" -> if (isSelected) Icons.Filled.Person else Icons.Outlined.Person
+                            "services" -> if (isSelected) Icons.Filled.Build else Icons.Outlined.Build
+                            "new_budget" -> if (isSelected) Icons.Filled.AddCircle else Icons.Outlined.AddCircle
+                            "history" -> if (isSelected) Icons.Filled.History else Icons.Outlined.History
+                            else -> if (isSelected) Icons.Filled.Home else Icons.Outlined.Home
+                        }
+                        NavigationRailItem(
+                            selected = isSelected,
+                            onClick = { currentTab = route },
+                            icon = { Icon(icon, contentDescription = label) },
+                            label = { Text(label, fontWeight = FontWeight.SemiBold) },
+                            modifier = Modifier.testTag("nav_rail_item_$route")
                         )
                     }
+                    Spacer(modifier = Modifier.weight(1f))
                 }
-            ) {
-                Spacer(modifier = Modifier.weight(1f))
-                navItems.forEach { (route, label, icon) ->
-                    NavigationRailItem(
-                        selected = currentTab == route,
-                        onClick = { currentTab = route },
-                        icon = { Icon(icon, contentDescription = label) },
-                        label = { Text(label, fontWeight = FontWeight.SemiBold) },
-                        modifier = Modifier.testTag("nav_rail_item_$route")
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
+                VerticalDivider(
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                    thickness = 1.dp,
+                    modifier = Modifier.fillMaxHeight()
+                )
             }
         }
 
@@ -125,7 +143,7 @@ fun MainAppWorkspace(
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            text = "OrçaFacil",
+                            text = "OrçaFácil",
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -178,18 +196,33 @@ fun MainAppWorkspace(
             bottomBar = {
                 // Bottom Navigation Bar on standard smartphones (Compact Form Factor)
                 if (!isTablet) {
-                    NavigationBar(
-                        modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ) {
-                        navItems.forEach { (route, label, icon) ->
-                            NavigationBarItem(
-                                selected = currentTab == route,
-                                onClick = { currentTab = route },
-                                icon = { Icon(icon, contentDescription = label) },
-                                label = { Text(label, fontSize = 10.sp, fontWeight = FontWeight.SemiBold) },
-                                modifier = Modifier.testTag("bottom_nav_item_$route")
-                            )
+                    Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                            thickness = 1.dp
+                        )
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            tonalElevation = 0.dp
+                        ) {
+                            navItems.forEach { (route, label) ->
+                                val isSelected = currentTab == route
+                                val icon = when (route) {
+                                    "dashboard" -> if (isSelected) Icons.Filled.Dashboard else Icons.Outlined.Dashboard
+                                    "clients" -> if (isSelected) Icons.Filled.Person else Icons.Outlined.Person
+                                    "services" -> if (isSelected) Icons.Filled.Build else Icons.Outlined.Build
+                                    "new_budget" -> if (isSelected) Icons.Filled.AddCircle else Icons.Outlined.AddCircle
+                                    "history" -> if (isSelected) Icons.Filled.History else Icons.Outlined.History
+                                    else -> if (isSelected) Icons.Filled.Home else Icons.Outlined.Home
+                                }
+                                NavigationBarItem(
+                                    selected = isSelected,
+                                    onClick = { currentTab = route },
+                                    icon = { Icon(icon, contentDescription = label) },
+                                    label = { Text(label, fontSize = 10.sp, fontWeight = FontWeight.SemiBold) },
+                                    modifier = Modifier.testTag("bottom_nav_item_$route")
+                                )
+                            }
                         }
                     }
                 }

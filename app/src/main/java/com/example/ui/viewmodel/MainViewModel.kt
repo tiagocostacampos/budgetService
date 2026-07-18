@@ -30,6 +30,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         private set
     var loginErrorMessage by mutableStateOf("")
         private set
+    var loggedInUserEmail by mutableStateOf("")
+        private set
+    var loggedInUserName by mutableStateOf("")
+        private set
 
     // Database Flows
     val clients: StateFlow<List<Client>>
@@ -63,6 +67,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         // Check if PIN is already set
         isPinConfigured = prefs.contains("app_pin")
+        
+        // Check session
+        isAuthenticated = prefs.getBoolean("is_authenticated", false)
+        loggedInUserEmail = prefs.getString("logged_in_email", "") ?: ""
+        loggedInUserName = prefs.getString("logged_in_name", "") ?: ""
         
         // Populate sample data if DB is completely empty (first run) to give the user an amazing immediate dashboard experience!
         viewModelScope.launch {
@@ -179,6 +188,108 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun logout() {
         isAuthenticated = false
+        loggedInUserEmail = ""
+        loggedInUserName = ""
+        prefs.edit()
+            .putBoolean("is_authenticated", false)
+            .remove("logged_in_email")
+            .remove("logged_in_name")
+            .apply()
+    }
+
+    fun loginWithEmail(email: String, password: String): Boolean {
+        if (email.isBlank() || password.isBlank()) {
+            loginErrorMessage = "E-mail e senha são obrigatórios."
+            return false
+        }
+        
+        val lowerEmail = email.trim().lowercase()
+        val storedUserData = prefs.getString("user_credentials_$lowerEmail", null)
+        
+        val passwordAndName = if (storedUserData != null) {
+            val parts = storedUserData.split("|")
+            if (parts.size >= 2) parts[0] to parts[1] else null
+        } else if (lowerEmail == "admin@email.com" || lowerEmail == "admin@gmail.com") {
+            "admin123" to "Administrador"
+        } else if (lowerEmail == "tiagocostac@gmail.com") {
+            "senha123" to "Tiago Costa"
+        } else {
+            null
+        }
+
+        if (passwordAndName != null && passwordAndName.first == password) {
+            isAuthenticated = true
+            loggedInUserEmail = lowerEmail
+            loggedInUserName = passwordAndName.second
+            loginErrorMessage = ""
+            
+            prefs.edit()
+                .putBoolean("is_authenticated", true)
+                .putString("logged_in_email", lowerEmail)
+                .putString("logged_in_name", passwordAndName.second)
+                .apply()
+            return true
+        } else {
+            loginErrorMessage = "E-mail ou senha incorretos."
+            return false
+        }
+    }
+
+    fun registerWithEmail(name: String, email: String, password: String): Boolean {
+        if (name.isBlank() || email.isBlank() || password.isBlank()) {
+            loginErrorMessage = "Todos os campos são obrigatórios."
+            return false
+        }
+        if (!email.contains("@")) {
+            loginErrorMessage = "Por favor, insira um e-mail válido."
+            return false
+        }
+        if (password.length < 6) {
+            loginErrorMessage = "A senha deve ter no mínimo 6 caracteres."
+            return false
+        }
+
+        val lowerEmail = email.trim().lowercase()
+        if (prefs.contains("user_credentials_$lowerEmail") || lowerEmail == "admin@email.com" || lowerEmail == "tiagocostac@gmail.com") {
+            loginErrorMessage = "Este e-mail já está cadastrado."
+            return false
+        }
+
+        // Store credentials
+        prefs.edit().putString("user_credentials_$lowerEmail", "$password|$name").apply()
+        
+        // Log in immediately
+        isAuthenticated = true
+        loggedInUserEmail = lowerEmail
+        loggedInUserName = name
+        loginErrorMessage = ""
+        
+        prefs.edit()
+            .putBoolean("is_authenticated", true)
+            .putString("logged_in_email", lowerEmail)
+            .putString("logged_in_name", name)
+            .apply()
+        
+        return true
+    }
+
+    fun loginOrRegisterWithGoogle(email: String, name: String) {
+        val lowerEmail = email.trim().lowercase()
+        isAuthenticated = true
+        loggedInUserEmail = lowerEmail
+        loggedInUserName = name
+        loginErrorMessage = ""
+        
+        // Save in stored credentials if not exist (using a placeholder password)
+        if (!prefs.contains("user_credentials_$lowerEmail")) {
+            prefs.edit().putString("user_credentials_$lowerEmail", "google_oauth_bypass|$name").apply()
+        }
+        
+        prefs.edit()
+            .putBoolean("is_authenticated", true)
+            .putString("logged_in_email", lowerEmail)
+            .putString("logged_in_name", name)
+            .apply()
     }
 
     // Client CRUD Operations

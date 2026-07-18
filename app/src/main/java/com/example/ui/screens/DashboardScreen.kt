@@ -2,6 +2,7 @@ package com.example.ui.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -136,8 +137,9 @@ fun DashboardScreen(
                                 modifier = Modifier.size(28.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
+                            val displayName = viewModel.loggedInUserName.ifEmpty { "Geral" }
                             Text(
-                                text = "Visão Geral do Negócio",
+                                text = "Olá, $displayName!",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -165,18 +167,19 @@ fun DashboardScreen(
                         title = "Receita Faturada/Aprovada",
                         value = currencyFormat.format(totalRevenueConcluded),
                         subtext = "${approvedBudgets.size} orçamentos aprovados",
-                        color = Color(0xFF2E7D32),
                         modifier = Modifier.weight(1f),
                         gradientBrush = Brush.linearGradient(
-                            colors = listOf(Color(0xFF4F46E5), Color(0xFF7C3AED))
+                            colors = listOf(Color(0xFF0D9488), Color(0xFF059669)) // Teal to Emerald
                         )
                     )
                     MetricCard(
                         title = "Receita Sob Negociação",
                         value = currencyFormat.format(totalRevenuePending),
                         subtext = "${pendingBudgets.size} orçamentos pendentes",
-                        color = Color(0xFFEF6C00),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        gradientBrush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF4F46E5), Color(0xFF7C3AED)) // Indigo to Violet
+                        )
                     )
                 }
             } else {
@@ -185,18 +188,19 @@ fun DashboardScreen(
                         title = "Receita Faturada/Aprovada",
                         value = currencyFormat.format(totalRevenueConcluded),
                         subtext = "${approvedBudgets.size} orçamentos aprovados",
-                        color = Color(0xFF2E7D32),
                         modifier = Modifier.fillMaxWidth(),
                         gradientBrush = Brush.linearGradient(
-                            colors = listOf(Color(0xFF4F46E5), Color(0xFF7C3AED))
+                            colors = listOf(Color(0xFF0D9488), Color(0xFF059669)) // Teal to Emerald
                         )
                     )
                     MetricCard(
                         title = "Receita Sob Negociação",
                         value = currencyFormat.format(totalRevenuePending),
                         subtext = "${pendingBudgets.size} orçamentos pendentes",
-                        color = Color(0xFFEF6C00),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        gradientBrush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF4F46E5), Color(0xFF7C3AED)) // Indigo to Violet
+                        )
                     )
                 }
             }
@@ -238,10 +242,17 @@ fun DashboardScreen(
                         modifier = Modifier
                             .weight(1.2f)
                             .height(280.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Faturamento Mensal (R$)", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                text = "Faturamento Mensal (R$)",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Spacer(modifier = Modifier.height(16.dp))
                             BarChart(data = monthlyData, modifier = Modifier.fillMaxSize())
                         }
@@ -252,10 +263,17 @@ fun DashboardScreen(
                         modifier = Modifier
                             .weight(0.8f)
                             .height(280.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Distribuição de Orçamentos", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                text = "Distribuição de Orçamentos",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Spacer(modifier = Modifier.height(16.dp))
                             DonutChart(
                                 pending = pendingBudgets.size.toFloat(),
@@ -273,10 +291,17 @@ fun DashboardScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(260.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Faturamento Mensal (R$)", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                text = "Faturamento Mensal (R$)",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Spacer(modifier = Modifier.height(12.dp))
                             BarChart(data = monthlyData, modifier = Modifier.fillMaxSize())
                         }
@@ -287,10 +312,17 @@ fun DashboardScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(240.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Distribuição de Orçamentos", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                text = "Distribuição de Orçamentos",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Spacer(modifier = Modifier.height(12.dp))
                             DonutChart(
                                 pending = pendingBudgets.size.toFloat(),
@@ -327,48 +359,41 @@ fun MetricCard(
     title: String,
     value: String,
     subtext: String,
-    color: Color,
     modifier: Modifier = Modifier,
-    gradientBrush: Brush? = null
+    gradientBrush: Brush
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (gradientBrush != null) Color.Transparent else MaterialTheme.colorScheme.surfaceVariant
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (gradientBrush != null) 4.dp else 1.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        val contentModifier = if (gradientBrush != null) {
-            Modifier
-                .background(gradientBrush)
+        Column(
+            modifier = Modifier
+                .background(gradientBrush, shape = RoundedCornerShape(16.dp))
                 .fillMaxWidth()
                 .padding(20.dp)
-        } else {
-            Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        }
-        
-        Column(modifier = contentModifier) {
+        ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodySmall,
-                color = if (gradientBrush != null) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                fontWeight = FontWeight.Medium
+                color = Color.White.copy(alpha = 0.85f),
+                fontWeight = FontWeight.SemiBold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = if (gradientBrush != null) Color.White else color
+                color = Color.White,
+                fontSize = 22.sp
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = subtext,
                 style = MaterialTheme.typography.bodySmall,
-                color = if (gradientBrush != null) Color.White.copy(alpha = 0.9f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                color = Color.White.copy(alpha = 0.9f),
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -382,8 +407,10 @@ fun SmallMetricCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -394,8 +421,9 @@ fun SmallMetricCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
@@ -414,67 +442,77 @@ fun BarChart(
     modifier: Modifier = Modifier
 ) {
     val barColor = MaterialTheme.colorScheme.primary
-    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-    val textLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    val barSecondaryColor = MaterialTheme.colorScheme.secondary
+    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
 
     val maxValue = remember(data) { (data.maxOfOrNull { it.second } ?: 1.0).coerceAtLeast(1.0) }
 
-    Canvas(modifier = modifier.padding(bottom = 20.dp, top = 8.dp, end = 8.dp)) {
-        val width = size.width
-        val height = size.height
-        val barCount = data.size
-        
-        // Draw standard horizontal gridlines
-        val gridLines = 4
-        for (i in 0..gridLines) {
-            val y = height * (i.toFloat() / gridLines)
-            drawLine(
-                color = gridColor,
-                start = Offset(0f, y),
-                end = Offset(width, y),
-                strokeWidth = 1f
-            )
-        }
+    Column(modifier = modifier) {
+        Canvas(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(bottom = 12.dp, top = 8.dp, end = 4.dp)
+        ) {
+            val width = size.width
+            val height = size.height
+            val barCount = data.size
+            
+            // Draw standard horizontal gridlines
+            val gridLines = 4
+            for (i in 0..gridLines) {
+                val y = height * (i.toFloat() / gridLines)
+                drawLine(
+                    color = gridColor,
+                    start = Offset(0f, y),
+                    end = Offset(width, y),
+                    strokeWidth = 1f
+                )
+            }
 
-        // Draw bars
-        val spacing = width / (barCount * 2 + 1)
-        val barWidth = spacing
+            // Draw bars
+            val spacing = width / (barCount * 2 + 1)
+            val barWidth = spacing
 
-        data.forEachIndexed { index, (label, value) ->
-            val barHeight = (value / maxValue * height).toFloat()
-            val x = spacing + index * (barWidth + spacing * 1.5f)
-            val y = height - barHeight
-
-            // Draw bar
-            drawRect(
-                color = barColor,
-                topLeft = Offset(x, y),
-                size = Size(barWidth, barHeight)
+            val barBrush = Brush.verticalGradient(
+                colors = listOf(barColor, barSecondaryColor)
             )
 
-            // Draw Label text
-            // Note: Since native canvas text drawing is simpler, we draw labels and currency totals nicely
-        }
-    }
+            data.forEachIndexed { index, (_, value) ->
+                val barHeight = (value / maxValue * height).toFloat()
+                val x = spacing + index * (barWidth + spacing * 1.5f)
+                val y = height - barHeight
 
-    // Compose text overlays for monthly bar labels
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        data.forEach { (label, value) ->
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                // Draw bar with premium rounded top corners
+                drawRoundRect(
+                    brush = barBrush,
+                    topLeft = Offset(x, y),
+                    size = Size(barWidth, barHeight.coerceAtLeast(4f)),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(6.dp.toPx(), 6.dp.toPx())
                 )
-                Text(
-                    text = if (value > 1000) "R$ ${(value/1000).toInt()}k" else "R$ ${value.toInt()}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
+            }
+        }
+
+        // Compose text overlays for monthly bar labels
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            data.forEach { (label, value) ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = if (value > 1000) "R$ ${(value/1000).toInt()}k" else "R$ ${value.toInt()}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
