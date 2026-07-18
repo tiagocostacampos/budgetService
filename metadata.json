@@ -1,0 +1,6 @@
+{
+  "name": "OrçaFacil",
+  "description": "Aplicativo completo de orçamentos e serviços com cadastro de clientes, geração de PDF para WhatsApp, histórico, autenticação e gráficos de desempenho.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
