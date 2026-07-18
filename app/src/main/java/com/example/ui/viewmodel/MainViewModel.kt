@@ -293,9 +293,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // Client CRUD Operations
-    fun addClient(name: String, phone: String, email: String, address: String) {
+    fun addClient(name: String, phone: String, email: String, address: String, cep: String = "", referencePoint: String = "") {
         viewModelScope.launch {
-            repository.insertClient(Client(name = name, phone = phone, email = email, address = address))
+            repository.insertClient(Client(name = name, phone = phone, email = email, address = address, cep = cep, referencePoint = referencePoint))
         }
     }
 

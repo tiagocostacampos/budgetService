@@ -11,7 +11,7 @@ import com.example.data.model.Budget
 import com.example.data.model.Client
 import com.example.data.model.Service
 
-@Database(entities = [Client::class, Service::class, Budget::class], version = 1, exportSchema = false)
+@Database(entities = [Client::class, Service::class, Budget::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun clientDao(): ClientDao
     abstract fun serviceDao(): ServiceDao

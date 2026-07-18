@@ -12,10 +12,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -99,7 +105,7 @@ fun DashboardScreen(
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(20.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Box(
@@ -115,11 +121,18 @@ fun DashboardScreen(
                         contentScale = ContentScale.Crop
                     )
 
-                    // Dark overlay to guarantee contrast and visual hierarchy
+                    // Dark gradient overlay to guarantee premium look and high contrast
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.55f))
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Black.copy(alpha = 0.4f),
+                                        Color.Black.copy(alpha = 0.7f)
+                                    )
+                                )
+                            )
                     )
 
                     // Card Content
@@ -167,6 +180,7 @@ fun DashboardScreen(
                         title = "Receita Faturada/Aprovada",
                         value = currencyFormat.format(totalRevenueConcluded),
                         subtext = "${approvedBudgets.size} orçamentos aprovados",
+                        icon = Icons.Default.CheckCircle,
                         modifier = Modifier.weight(1f),
                         gradientBrush = Brush.linearGradient(
                             colors = listOf(Color(0xFF0D9488), Color(0xFF059669)) // Teal to Emerald
@@ -176,6 +190,7 @@ fun DashboardScreen(
                         title = "Receita Sob Negociação",
                         value = currencyFormat.format(totalRevenuePending),
                         subtext = "${pendingBudgets.size} orçamentos pendentes",
+                        icon = Icons.Default.HourglassEmpty,
                         modifier = Modifier.weight(1f),
                         gradientBrush = Brush.linearGradient(
                             colors = listOf(Color(0xFF4F46E5), Color(0xFF7C3AED)) // Indigo to Violet
@@ -188,6 +203,7 @@ fun DashboardScreen(
                         title = "Receita Faturada/Aprovada",
                         value = currencyFormat.format(totalRevenueConcluded),
                         subtext = "${approvedBudgets.size} orçamentos aprovados",
+                        icon = Icons.Default.CheckCircle,
                         modifier = Modifier.fillMaxWidth(),
                         gradientBrush = Brush.linearGradient(
                             colors = listOf(Color(0xFF0D9488), Color(0xFF059669)) // Teal to Emerald
@@ -197,6 +213,7 @@ fun DashboardScreen(
                         title = "Receita Sob Negociação",
                         value = currencyFormat.format(totalRevenuePending),
                         subtext = "${pendingBudgets.size} orçamentos pendentes",
+                        icon = Icons.Default.HourglassEmpty,
                         modifier = Modifier.fillMaxWidth(),
                         gradientBrush = Brush.linearGradient(
                             colors = listOf(Color(0xFF4F46E5), Color(0xFF7C3AED)) // Indigo to Violet
@@ -206,7 +223,7 @@ fun DashboardScreen(
             }
         }
 
-        // Sub Counters Row
+        // Sub Counters Row (Proportional with custom tinted icons)
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -215,22 +232,31 @@ fun DashboardScreen(
                 SmallMetricCard(
                     title = "Clientes",
                     value = clients.size.toString(),
+                    icon = Icons.Default.People,
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    iconBgColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
                     modifier = Modifier.weight(1f)
                 )
                 SmallMetricCard(
                     title = "Serviços",
                     value = services.size.toString(),
+                    icon = Icons.Default.Build,
+                    iconColor = MaterialTheme.colorScheme.secondary,
+                    iconBgColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.45f),
                     modifier = Modifier.weight(1f)
                 )
                 SmallMetricCard(
-                    title = "Total Orçamentos",
+                    title = "Orçamentos",
                     value = totalBudgets.toString(),
+                    icon = Icons.Default.Description,
+                    iconColor = MaterialTheme.colorScheme.tertiary,
+                    iconBgColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.45f),
                     modifier = Modifier.weight(1f)
                 )
             }
         }
 
-        // Charts Section (Responsive Row on Tablet / Column on Phone)
+        // Charts Section (Perfectly proportional heights and widths)
         item {
             if (isTablet) {
                 Row(
@@ -240,10 +266,10 @@ fun DashboardScreen(
                     // Bar Chart for Revenue
                     Card(
                         modifier = Modifier
-                            .weight(1.2f)
-                            .height(280.dp),
+                            .weight(1f)
+                            .height(300.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -261,10 +287,10 @@ fun DashboardScreen(
                     // Status Pie Chart
                     Card(
                         modifier = Modifier
-                            .weight(0.8f)
-                            .height(280.dp),
+                            .weight(1f)
+                            .height(300.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -290,9 +316,9 @@ fun DashboardScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(260.dp),
+                            .height(280.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -302,7 +328,7 @@ fun DashboardScreen(
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
                             BarChart(data = monthlyData, modifier = Modifier.fillMaxSize())
                         }
                     }
@@ -311,9 +337,9 @@ fun DashboardScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(240.dp),
+                            .height(280.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -323,7 +349,7 @@ fun DashboardScreen(
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
                             DonutChart(
                                 pending = pendingBudgets.size.toFloat(),
                                 approved = approvedBudgets.size.toFloat(),
@@ -343,7 +369,7 @@ fun DashboardScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Icon")
@@ -359,42 +385,73 @@ fun MetricCard(
     title: String,
     value: String,
     subtext: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     modifier: Modifier = Modifier,
     gradientBrush: Brush
 ) {
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.height(130.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .background(gradientBrush, shape = RoundedCornerShape(16.dp))
-                .fillMaxWidth()
-                .padding(20.dp)
+                .background(gradientBrush)
+                .fillMaxSize()
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.85f),
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                fontSize = 22.sp
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = subtext,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.9f),
-                fontWeight = FontWeight.Medium
-            )
+            // Subtle glowing circle accent in the background
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.05f),
+                    radius = size.minDimension * 0.45f,
+                    center = Offset(size.width * 0.9f, size.height * 0.2f)
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.85f),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.85f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                
+                Column {
+                    Text(
+                        text = value,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            color = Color.White,
+                            fontSize = 24.sp
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = subtext,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
         }
     }
 }
@@ -403,35 +460,59 @@ fun MetricCard(
 fun SmallMetricCard(
     title: String,
     value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconColor: Color,
+    iconBgColor: Color,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.height(100.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Medium
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(iconBgColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            
+            Column(
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1
+                )
+            }
         }
     }
 }
@@ -443,76 +524,60 @@ fun BarChart(
 ) {
     val barColor = MaterialTheme.colorScheme.primary
     val barSecondaryColor = MaterialTheme.colorScheme.secondary
-    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
-
     val maxValue = remember(data) { (data.maxOfOrNull { it.second } ?: 1.0).coerceAtLeast(1.0) }
 
-    Column(modifier = modifier) {
-        Canvas(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(bottom = 12.dp, top = 8.dp, end = 4.dp)
-        ) {
-            val width = size.width
-            val height = size.height
-            val barCount = data.size
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        data.forEach { (label, value) ->
+            val ratio = (value / maxValue).toFloat().coerceIn(0.04f, 1f)
             
-            // Draw standard horizontal gridlines
-            val gridLines = 4
-            for (i in 0..gridLines) {
-                val y = height * (i.toFloat() / gridLines)
-                drawLine(
-                    color = gridColor,
-                    start = Offset(0f, y),
-                    end = Offset(width, y),
-                    strokeWidth = 1f
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                // Centered Bar with premium gradient and rounded top
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false)
+                        .fillMaxHeight(ratio)
+                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(barColor, barSecondaryColor)
+                            )
+                        )
                 )
-            }
-
-            // Draw bars
-            val spacing = width / (barCount * 2 + 1)
-            val barWidth = spacing
-
-            val barBrush = Brush.verticalGradient(
-                colors = listOf(barColor, barSecondaryColor)
-            )
-
-            data.forEachIndexed { index, (_, value) ->
-                val barHeight = (value / maxValue * height).toFloat()
-                val x = spacing + index * (barWidth + spacing * 1.5f)
-                val y = height - barHeight
-
-                // Draw bar with premium rounded top corners
-                drawRoundRect(
-                    brush = barBrush,
-                    topLeft = Offset(x, y),
-                    size = Size(barWidth, barHeight.coerceAtLeast(4f)),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(6.dp.toPx(), 6.dp.toPx())
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Perfectly centered month label
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
                 )
-            }
-        }
-
-        // Compose text overlays for monthly bar labels
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            data.forEach { (label, value) ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = if (value > 1000) "R$ ${(value/1000).toInt()}k" else "R$ ${value.toInt()}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                
+                // Formatted Value
+                Text(
+                    text = if (value >= 1000) {
+                        String.format(Locale("pt", "BR"), "R$ %.1fk", value / 1000.0)
+                    } else {
+                        "R$ ${value.toInt()}"
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
             }
         }
     }
@@ -527,14 +592,13 @@ fun DonutChart(
 ) {
     val total = pending + approved + canceled
     
-    // Percentages
     val pendingPct = if (total > 0) pending / total else 0f
     val approvedPct = if (total > 0) approved / total else 0f
     val canceledPct = if (total > 0) canceled / total else 0f
 
-    val approvedColor = Color(0xFF2E7D32) // Green
-    val pendingColor = Color(0xFFEF6C00)  // Orange
-    val canceledColor = Color(0xFFC62828)  // Red
+    val approvedColor = Color(0xFF10B981) // Emerald
+    val pendingColor = Color(0xFFF59E0B)  // Amber
+    val canceledColor = Color(0xFFEF4444)  // Red
 
     Row(
         modifier = modifier,
@@ -544,11 +608,11 @@ fun DonutChart(
         Box(
             modifier = Modifier
                 .size(130.dp)
-                .padding(8.dp),
+                .padding(6.dp),
             contentAlignment = Alignment.Center
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                val strokeWidth = 35f
+                val strokeWidth = 32f
                 val canvasSize = size.minDimension
                 val diameter = canvasSize - strokeWidth
                 val rect = Size(diameter, diameter)
@@ -556,7 +620,7 @@ fun DonutChart(
 
                 if (total == 0f) {
                     drawArc(
-                        color = Color.LightGray.copy(alpha = 0.3f),
+                        color = Color.LightGray.copy(alpha = 0.2f),
                         startAngle = 0f,
                         sweepAngle = 360f,
                         useCenter = false,
@@ -613,24 +677,24 @@ fun DonutChart(
                 }
             }
             
-            // Text inside donut
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = total.toInt().toString(),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Black,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = "Emitidos",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Legend Column
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxHeight(),
@@ -647,16 +711,17 @@ fun DonutChart(
 fun LegendItem(color: Color, label: String, value: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Box(
             modifier = Modifier
                 .size(12.dp)
-                .background(color, shape = RoundedCornerShape(2.dp))
+                .background(color, shape = RoundedCornerShape(3.dp))
         )
         Text(
             text = "$label ($value)",
             style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
     }

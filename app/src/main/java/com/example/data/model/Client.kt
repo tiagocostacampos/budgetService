@@ -9,5 +9,7 @@ data class Client(
     val name: String,
     val phone: String,
     val email: String,
-    val address: String
+    val address: String,
+    val cep: String = "",
+    val referencePoint: String = ""
 )

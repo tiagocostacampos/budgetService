@@ -12,12 +12,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.Client
 import com.example.ui.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,11 +37,17 @@ fun ClientsScreen(
     var selectedClientForEdit by remember { mutableStateOf<Client?>(null) }
     var showDeleteConfirmDialog by remember { mutableStateOf<Client?>(null) }
 
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     // Dialog input states
     var clientName by remember { mutableStateOf("") }
     var clientPhone by remember { mutableStateOf("") }
     var clientEmail by remember { mutableStateOf("") }
     var clientAddress by remember { mutableStateOf("") }
+    var clientCep by remember { mutableStateOf("") }
+    var clientReferencePoint by remember { mutableStateOf("") }
+    var isFetchingCep by remember { mutableStateOf(false) }
 
     // Filtered list
     val filteredClients = remember(clients, searchQuery) {
@@ -61,6 +71,8 @@ fun ClientsScreen(
                     clientPhone = ""
                     clientEmail = ""
                     clientAddress = ""
+                    clientCep = ""
+                    clientReferencePoint = ""
                     showAddEditDialog = true
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -144,6 +156,8 @@ fun ClientsScreen(
                                 clientPhone = client.phone
                                 clientEmail = client.email
                                 clientAddress = client.address
+                                clientCep = client.cep
+                                clientReferencePoint = client.referencePoint
                                 showAddEditDialog = true
                             },
                             onDeleteClicked = {
@@ -169,7 +183,9 @@ fun ClientsScreen(
             text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
                 ) {
                     OutlinedTextField(
                         value = clientName,
@@ -193,11 +209,81 @@ fun ClientsScreen(
                         modifier = Modifier.fillMaxWidth().testTag("client_email_input"),
                         singleLine = true
                     )
+                    
+                    // CEP Search Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = clientCep,
+                            onValueChange = { newValue ->
+                                val filtered = newValue.filter { it.isDigit() || it == '-' }
+                                if (filtered.length <= 9) {
+                                    clientCep = filtered
+                                }
+                            },
+                            label = { Text("CEP") },
+                            placeholder = { Text("Ex: 01001-000") },
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                            ),
+                            singleLine = true,
+                            modifier = Modifier.weight(1f).testTag("client_cep_input")
+                        )
+                        
+                        Button(
+                            onClick = {
+                                if (clientCep.isNotBlank()) {
+                                    coroutineScope.launch {
+                                        isFetchingCep = true
+                                        val result = com.example.util.CepHelper.fetchAddressByCep(clientCep)
+                                        isFetchingCep = false
+                                        if (result != null) {
+                                            if (result.erro) {
+                                                android.widget.Toast.makeText(context, "CEP não localizado.", android.widget.Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                clientAddress = result.toFormattedAddress()
+                                                android.widget.Toast.makeText(context, "Endereço preenchido!", android.widget.Toast.LENGTH_SHORT).show()
+                                            }
+                                        } else {
+                                            android.widget.Toast.makeText(context, "Erro ao buscar CEP.", android.widget.Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                } else {
+                                    android.widget.Toast.makeText(context, "Insira um CEP.", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            enabled = !isFetchingCep && clientCep.isNotBlank(),
+                            modifier = Modifier.height(56.dp).testTag("client_cep_search_button")
+                        ) {
+                            if (isFetchingCep) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(Icons.Default.Search, contentDescription = "Buscar CEP")
+                            }
+                        }
+                    }
+
                     OutlinedTextField(
                         value = clientAddress,
                         onValueChange = { clientAddress = it },
                         label = { Text("Endereço Completo") },
                         modifier = Modifier.fillMaxWidth().testTag("client_address_input")
+                    )
+
+                    OutlinedTextField(
+                        value = clientReferencePoint,
+                        onValueChange = { clientReferencePoint = it },
+                        label = { Text("Ponto de Referência") },
+                        placeholder = { Text("Ex: Próximo à padaria, casa amarela...") },
+                        modifier = Modifier.fillMaxWidth().testTag("client_reference_input"),
+                        singleLine = true
                     )
                 }
             },
@@ -211,7 +297,9 @@ fun ClientsScreen(
                                 name = clientName.trim(),
                                 phone = clientPhone.trim(),
                                 email = clientEmail.trim(),
-                                address = clientAddress.trim()
+                                address = clientAddress.trim(),
+                                cep = clientCep.trim(),
+                                referencePoint = clientReferencePoint.trim()
                             )
                         } else {
                             viewModel.updateClient(
@@ -219,7 +307,9 @@ fun ClientsScreen(
                                     name = clientName.trim(),
                                     phone = clientPhone.trim(),
                                     email = clientEmail.trim(),
-                                    address = clientAddress.trim()
+                                    address = clientAddress.trim(),
+                                    cep = clientCep.trim(),
+                                    referencePoint = clientReferencePoint.trim()
                                 )
                             )
                         }
@@ -364,22 +454,42 @@ fun ClientItemCard(
                     }
                 }
 
-                if (client.address.isNotEmpty()) {
+                if (client.address.isNotEmpty() || client.cep.isNotEmpty() || client.referencePoint.isNotEmpty()) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Top,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.LocationOn,
                             contentDescription = "Location Icon",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            modifier = Modifier.size(14.dp)
+                            modifier = Modifier.size(14.dp).padding(top = 2.dp)
                         )
-                        Text(
-                            text = client.address,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-                        )
+                        Column {
+                            if (client.address.isNotEmpty()) {
+                                Text(
+                                    text = client.address,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                                )
+                            }
+                            if (client.cep.isNotEmpty() || client.referencePoint.isNotEmpty()) {
+                                val details = buildString {
+                                    if (client.cep.isNotEmpty()) {
+                                        append("CEP: ${client.cep}")
+                                    }
+                                    if (client.referencePoint.isNotEmpty()) {
+                                        if (isNotEmpty()) append(" • ")
+                                        append("Ref: ${client.referencePoint}")
+                                    }
+                                }
+                                Text(
+                                    text = details,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                )
+                            }
+                        }
                     }
                 }
             }
